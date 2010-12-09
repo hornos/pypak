@@ -2,6 +2,7 @@
 # Script
 #
 
+import os
 import string
 import ConfigParser
 from optparse import OptionParser
@@ -9,7 +10,8 @@ import numpy
 from pypak.Types import *
 
 class Script( Debug ):
-  def __init__( self, scn = "pypak script", gpc = "pypak.ini" ):
+  def __init__( self, scn = os.path.basename( sys.argv[0] ), 
+                      gpc = os.path.dirname( sys.argv[0] ) + "/pypak.ini" ):
     Debug.__init__( self )
     self.scn = scn
     self.optpar = OptionParser()

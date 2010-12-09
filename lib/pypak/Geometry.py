@@ -52,7 +52,7 @@ class Geometry:
     self.species = {}
     # regenerate
     for atom in self.atoms:
-      sym = atom.symbol()
+      sym = atom.symbol
       try:
         self.species[sym] += 1
       except:
@@ -64,7 +64,7 @@ class Geometry:
 
   def add( self, atom = None, renum = False ):
     _atom = copy.deepcopy( atom )
-    _atom.atom.no = self.ac
+    _atom.no = self.ac
     self.atoms.append( _atom )
     self.ac += 1
   # end def
@@ -137,7 +137,7 @@ class Geometry:
     r = numpy.zeros( 3 )
     for i in range( 0, 3 ):
       for j in range( 0, 3 ):
-        r[i] += rho[j] * self.lat_vec[j][i] * self.latt_c
+        r[i] += rho[j] * self.lat_vec[j][i] * self.lat_c
       # end for
     # end for
     return r

@@ -17,7 +17,7 @@ class Enum( object ):
 
 
 PT  = Enum( 'Direct Cart' )
-DPT = { PT.Direct : 'Direct', PT.Cart : 'Cart' }
+PTD = { PT.Direct : 'Direct', PT.Cart : 'Cart' }
 IOT = Enum( 'Input Output' )
 
 
