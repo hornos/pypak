@@ -27,7 +27,7 @@ class Program( Script ):
 
     self.opt( "-o", "--output",
               action = "store", type = "string",
-              dest = "output_name", default = "output.CART.POSCAR",
+              dest = "output_name", default = "output",
               help = "Output" )
 
     self.opt( "-d", "--direct",
@@ -53,6 +53,7 @@ class Program( Script ):
     if options.direct:
       pt = PT.Direct
     # end if
+    output_name += "."+PTD[pt]
 
     sysopts = { "verbose" : self.verbose, "debug" : self.debug }
 
@@ -63,9 +64,11 @@ class Program( Script ):
     fileio = 'POSCAR'
     opts = { 'pt' : pt }
     if options.xyz:
-      output_name = output_name + '.xyz'
+      output_name += '.xyz'
       fileio = 'xyz'
       opts = { 'pt' : PT.Cart }
+    else:
+      output_name += '.POSCAR'
     # end if
     output_file = FileIO( output_name,fileio, "w+", sysopts )
     output_file.geom( geom )
