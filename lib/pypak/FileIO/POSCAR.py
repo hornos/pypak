@@ -144,6 +144,7 @@ class FileIO( File ):
     for atom in self.geom.atoms:
       line = ["",""]
       # convert
+      pos = atom.position
       if self.geom.pt != pt:
         if pt == PT.Cart:
           # D -> C
@@ -153,8 +154,6 @@ class FileIO( File ):
           # C -> D
           pos = self.geom.position_direct( atom.position )
         # end if
-      else:
-        pos = atom.position
       # end if
 
       mov = atom.moveable

@@ -30,12 +30,31 @@ class FileIO( File ):
     # dump header
     self.putline( self.geom.natoms() )
     self.putline( self.geom.name )
+    try:
+      pt = opts['pt']
+    except:
+      pt = PT.Cart
+    # end try
+
     # dump coordinates
     for atom in self.geom.atoms:
       s = atom.symbol
-      pos = atom.position
       mov = atom.moveable
       line[0] = "  %2s" % s
+
+      # convert
+      pos = atom.position
+      if self.geom.pt != pt:
+        if pt == PT.Cart:
+          # D -> C
+          opos = atom.position
+          pos = self.geom.position_cart( atom.position )
+        else:
+          # C -> D
+          pos = self.geom.position_direct( atom.position )
+        # end if
+      # end if
+
       for i in range( 0, 3 ):
         line[0] += "  %20.16f" % pos[i]
       # end for

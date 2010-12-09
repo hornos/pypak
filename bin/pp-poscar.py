@@ -35,6 +35,11 @@ class Program( Script ):
               dest = "direct", default = False,
               help = "Direct" )
 
+    self.opt( "-x", "--xyz",
+              action = "store_true",
+              dest = "xyz", default = False,
+              help = "XYZ" )
+
     self.ini()
   # end def __init__
 
@@ -54,11 +59,17 @@ class Program( Script ):
     input_file  = FileIO( input_name,'POSCAR', "r", sysopts )
     input_file.read()
     geom = input_file.geom()
-    # geom.check()
 
-    output_file = FileIO( output_name,'POSCAR', "w+", sysopts )
+    fileio = 'POSCAR'
+    opts = { 'pt' : pt }
+    if options.xyz:
+      output_name = output_name + '.xyz'
+      fileio = 'xyz'
+      opts = { 'pt' : PT.Cart }
+    # end if
+    output_file = FileIO( output_name,fileio, "w+", sysopts )
     output_file.geom( geom )
-    output_file.write( { 'pt' : pt } )
+    output_file.write( opts )
   # end def
 # end class
 
