@@ -13,7 +13,7 @@ class Script( Debug ):
   def __init__( self, scn = os.path.basename( sys.argv[0] ), 
                       gpc = os.path.dirname( sys.argv[0] ) + "/pypak.ini" ):
     Debug.__init__( self )
-    self.scn = scn
+    self.scn    = scn
     self.optpar = OptionParser()
     self.gpc    = gpc
     self.upc    = None
@@ -47,32 +47,32 @@ class Script( Debug ):
 
     ## Global Config
     try:
-      self.gpcpar.read( self.gpc )
+      self.gpcpar.readfp( open( self.gpc ) )
       if self.verbose :
-        print ' Global config: ' + self.gpc
+        print ' Global: ' + self.gpc
     except:
       if self.verbose :
-        print ' Not Found: ' + self.gpc
+        print ' Missing: ' + self.gpc
     # end try
 
     ## Read User Config
     try:
-      self.upcpar.read( self.upc )
+      self.upcpar.readfp( open( self.upc ) )
       if self.verbose :
-        print ' User config: ' + self.upc
+        print ' User: ' + self.upc
     except:
       if self.verbose :
-        print ' Not Found: ' + self.upc
+        print ' Missing: ' + self.upc
     # end try
   # end def
 
 
   def cfg( self, item = None ):
     try:
-      return self.upcpar.get( self.name, item )
+      return self.upcpar.get( self.scn, item )
     except:
       try:
-        return self.gpcpar.get( self.name, item )
+        return self.gpcpar.get( self.scn, item )
       except:
         raise
       # end try

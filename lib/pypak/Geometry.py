@@ -144,7 +144,7 @@ class Geometry:
   # end def
 
   def position( self, atom = None, pt = PT.Direct ):
-    pos = r = atom.position()
+    pos = r = atom.position
     if self.pt != pt:
       if pt == PT.Cart:
         # D -> C
