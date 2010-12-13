@@ -11,7 +11,7 @@ sys.path.append( os.path.dirname( sys.argv[0] ) + "/../lib" )
 
 ### BEGIN PROGRAM CLASS
 from pypak.Script        import Script
-from pypak.FileIO.FileIO import FileIO
+from pypak.FileIO.FileIO import FileIO as FIO
 from pypak.Types         import *
 from pypak.Geometry      import Geometry
 
@@ -57,7 +57,7 @@ class Program( Script ):
 
     sysopts = { "verbose" : self.verbose, "debug" : self.debug }
 
-    input_file  = FileIO( input_name,'POSCAR', "r", sysopts )
+    input_file  = FIO( input_name,'POSCAR', "r", sysopts )
     input_file.read()
     geom = input_file.geom()
 
@@ -70,7 +70,7 @@ class Program( Script ):
     else:
       output_name += '.POSCAR'
     # end if
-    output_file = FileIO( output_name,fileio, "w+", sysopts )
+    output_file = FIO( output_name,fileio, "w+", sysopts )
     output_file.geom( geom )
     output_file.write( opts )
   # end def

@@ -29,9 +29,9 @@ def TF( logical ):
 
 
 class Debug:
-  def __init__( self, verbose = False, debug = False ):
-    self.verbose = verbose
-    self.debug   = debug
+  def __init__( self, sysopts = { "verbose" : False, "debug" : False } ):
+    self.verbose = sysopts["verbose"]
+    self.debug   = sysopts["debug"]
   # end def
 # end class
 

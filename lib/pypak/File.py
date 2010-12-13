@@ -11,7 +11,7 @@ from pypak.Types import *
 
 class File( Debug ):
   def __init__( self, path = None, opts = "rw" , sysopts = { "verbose" : False, "debug" : False } ):
-    Debug.__init__( self, sysopts["verbose"], sysopts["debug"] )
+    Debug.__init__( self, sysopts )
     self.path    = path
     self.opts    = opts
     self.fp      = None

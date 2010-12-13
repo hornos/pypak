@@ -11,7 +11,7 @@ from pypak.Types import *
 # try to load io handler based on type
 class FileIO( Debug ):
   def __init__( self, path = None, type = None, opts = "rw", sysopts = { "verbose" : False, "debug" : False } ):
-    Debug.__init__( self, sysopts["verbose"], sysopts["debug"] )
+    Debug.__init__( self, sysopts )
 
     if string.find( opts, "r" ) > -1:
       if not os.path.isfile( path ) :

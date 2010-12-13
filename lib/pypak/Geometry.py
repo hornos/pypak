@@ -69,10 +69,10 @@ class Geometry:
     self.ac += 1
   # end def
 
-  def get( self, i = 0, vmd = False ):
-    if not vmd:
-      return self.atoms[i-1]
-    return self.atoms[i]
+  def get( self, i = 0, vmd = True ):
+    if vmd:
+      return self.atoms[i]
+    return self.atoms[i-1]
   # end def
 
   def order( self ):
