@@ -39,12 +39,14 @@ matplotlib:
 	  $(TAR) xvzf $(MPL_TGZ); \
 	  mv ./matplotlib-* ./matplotlib.src; \
 	  mv ./matplotlib.src/__init__.py ./matplotlib.src/__init__.py.bak; \
-	  ln -s ./matplotlib.src/lib/matplotlib ./matplotlib; fi;
+	  ln -s ./matplotlib.src/lib/matplotlib ./matplotlib; \
+	  ln -s ./matplotlib.src/lib/mpl_toolkits ./mpl_toolkits; \
+	  fi;
 
 
 clean:
 	rm -fR ./urwid.git
 	rm -fR ./PyOpenGL.src
 	rm -fR ./matplotlib.src
-	rm *.tar.gz *.tgz urwid OpenGL matplotlib
+	rm *.tar.gz *.tgz urwid OpenGL matplotlib mpl_toolkits
 
