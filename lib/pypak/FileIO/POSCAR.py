@@ -104,8 +104,7 @@ class FileIO( File ):
   ### begin write
   # here we need to convert
   def write( self, opts = None ):
-    line1 = ""
-    line2 = ""
+    line = ["",""]
     self.rewind()
     self.clean()
     # dump header
@@ -113,21 +112,20 @@ class FileIO( File ):
     # dump lattice
     self.putline( "  %20.16f" % self.geom.lat_c )
     for i in range( 0, 3 ):
-      line1 = ""
+      line[0] = ""
       for j in range( 0, 3 ):
-        line1 += "  %20.16f" % self.geom.lat_vec[i][j]
+        line[0] += "  %20.16f" % self.geom.lat_vec[i][j]
       # end for
-      self.putline( line1 )
+      self.putline( line[0] )
     # end for
     # dump species
-    line1 = ""
-    line2 = ""
+    line = ["",""]
     for s in self.geom.species:
-      line1 += "  %4s" % s
-      line2 += "  %4d" % self.geom.species[s]
+      line[0] += "  %4s" % s
+      line[1] += "  %4d" % self.geom.species[s]
     # end for
-    self.putline( line1 )
-    self.putline( line2 )
+    self.putline( line[0] )
+    self.putline( line[1] )
     # dump coordinates
     self.putline( 'Selective dynamics' )
     try:

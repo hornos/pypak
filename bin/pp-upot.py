@@ -8,7 +8,7 @@ import numpy
 
 ### BEGIN HEADER
 sys.path.append( os.path.dirname( sys.argv[0] ) + "/../lib" )
-# ### END HEADER
+### END HEADER
 
 from pypak.Script import Script
 from pypak.FileIO.FileIO import FileIO as FIO
@@ -83,18 +83,12 @@ class Program( Script ):
     print ' Average Potential:', avg_cl_shift
     print
   # end def main
-###
 ### END PROGRAM CLASS
-###
 
-
-###
 ### BEGIN MAIN
-###
 if __name__ == '__main__':
   p = Program()
   p.main()
 # end if
-###
 ### END MAIN
-###
+
