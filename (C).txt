@@ -1,4 +1,5 @@
-    pypak
+    pypak is python library and tool collection for QM stuff
+
     Copyright (C) 2010  Tom Hornos
 
     This program is free software: you can redistribute it and/or modify
