@@ -1,5 +1,9 @@
 include arch.make
 
+# ply
+PLY_URL=https://github.com/dabeaz/ply/tarball/master
+PLY_TGZ=ply.tgz
+
 # urwid
 URW_URL=https://github.com/wardi/urwid/tarball/master
 URW_TGZ=urwid.tgz
@@ -12,9 +16,15 @@ PGL_TGZ=pyopengl.tgz
 MPL_URL=http://sourceforge.net/projects/matplotlib/files/matplotlib/matplotlib-1.0/matplotlib-1.0.0.tar.gz/download
 MPL_TGZ=matplotlib.tgz
 
-.PHONY: all urwid pyopengl matplotlib
+.PHONY: ply urwid pyopengl matplotlib
 
-all: urwid pyopengl matplotlib
+ply:
+	if ! test -d ./ply.git;then \
+	  if ! test -f $(PLY_TGZ);then \
+	    $(DL) -O $(PLY_TGZ) $(PLY_URL);fi; \
+	  $(TAR) xvzf $(PLY_TGZ); \
+	  mv ./*-ply-* ./ply.git; \
+	  ln -s ./ply.git/ply ./ply; fi;
 
 urwid:
 	if ! test -d ./urwid.git;then \
@@ -43,10 +53,10 @@ matplotlib:
 	  ln -s ./matplotlib.src/lib/mpl_toolkits ./mpl_toolkits; \
 	  fi;
 
-
 clean:
+	rm -fR ./ply.git
 	rm -fR ./urwid.git
 	rm -fR ./PyOpenGL.src
 	rm -fR ./matplotlib.src
-	rm *.tar.gz *.tgz urwid OpenGL matplotlib mpl_toolkits
+	rm *.tar.gz *.tgz ply urwid OpenGL matplotlib mpl_toolkits
 

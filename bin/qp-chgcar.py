@@ -5,6 +5,7 @@ import sys
 import string
 
 ### BEGIN HEADER
+script_name = os.path.basename( sys.argv[0] )
 sys.path.append( os.path.dirname( sys.argv[0] ) + "/../lib" )
 quantumpack_home   = os.path.dirname( sys.argv[0] ) + "/.."
 quantumpack_config = "qppak.ini"
