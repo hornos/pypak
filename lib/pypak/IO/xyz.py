@@ -7,11 +7,11 @@ import sys
 import string
 import numpy
 
-from pypak.File     import File
 from pypak.Types    import *
+from pypak.IO.File  import File
 from pypak.Geometry import Geometry
 
-class FileIO( File ):
+class IO( File ):
   def __init__( self, path = None, opts = "", sysopts = { "verbose" : False, "debug" : False } ):
     File.__init__( self, path, opts, sysopts )
     self.geom = Geometry( 'xyz' )

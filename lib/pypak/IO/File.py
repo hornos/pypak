@@ -8,7 +8,6 @@ import string
 
 from pypak.Types import *
 
-
 class File( Debug ):
   def __init__( self, path = None, opts = "rw" , sysopts = { "verbose" : False, "debug" : False } ):
     Debug.__init__( self, sysopts )

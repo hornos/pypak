@@ -8,13 +8,13 @@ import math
 import string
 import numpy
 
-from pypak.File          import File
 from pypak.Types         import *
-from pypak.FileIO.FileIO import FileIO as FIO
+from pypak.IO.IO         import IO
+from pypak.IO.File       import File
 from pypak.Geometry      import Geometry
 from pypak.Math          import *
 
-class FileIO( File ):
+class IO( File ):
   def __init__( self, path = None, opts = "", sysopts = { "verbose" : False, "debug" : False } ):
     File.__init__( self, path, opts, sysopts )
     self.geom = Geometry( 'UPOT' )
@@ -194,7 +194,7 @@ class FileIO( File ):
 
     # end if
     if lat_vec != None:
-      avg_output = FIO( 'atomlist.xyz', 'xyz', 'w+' )
+      avg_output = IO( 'atomlist.xyz', 'xyz', 'w+' )
       avg_output.geom( avg_xyz )
       avg_output.write()
     # end if

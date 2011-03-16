@@ -22,6 +22,18 @@ class Geometry:
     self.lat_c   = 1.0000 # Ang
   # end def
 
+  def clone( self ):
+    geom = Geometry( self.name )
+    geom.species = copy.deepcopy( self.species )
+    geom.atoms   = copy.deepcopy( self.atoms )
+    geom.ac      = copy.deepcopy( self.ac )
+    geom.pt      = copy.deepcopy( self.pt )
+    geom.lat_vec = copy.deepcopy( self.lat_vec )
+    geom.rec_vec = copy.deepcopy( self.rec_vec )
+    geom.lat_c   = copy.deepcopy( self.lat_c )
+    return geom
+  # end if
+
   def natoms( self ):
     return len( self.atoms )
   # end def
@@ -39,6 +51,8 @@ class Geometry:
     print "%20s%5d"  % ( "Species:", self.nspecies() )
     print "%20s%5d"  % ( "Atoms:", self.natoms() )
     print "%20s%5d"  % ( "PT:", self.pt )
+
+    print "\n%5s%5s%12s%12s%12s" % ( "no", "sym", "x", "y", "z" )
     for atom in self.atoms:
       sym = atom.symbol
       no  = atom.no
@@ -91,23 +105,6 @@ class Geometry:
   # end def
 
 
-  def nearest_old( self, r = numpy.zeros(3) ):
-    maxr  = 100000
-    natom = None
-    for a in self.atoms:
-      d = a.position() - r
-      dr = 0.000
-      for i in range(0,3):
-        dr += d[i]*d[i]
-      # end for
-      if maxr > dr:
-        natom = a
-        maxr  = dr
-      # end if
-    # end for
-    return natom
-  # end def
-
   def nearest( self, pos = None ):
     nearest_atom = None
     nearest_dpos = 100000.000
@@ -124,23 +121,11 @@ class Geometry:
 
   def position_direct( self, r = numpy.zeros( 3 ) ):
     self.reciprocal()
-    rho = numpy.zeros( 3 )
-    for i in range( 0, 3 ):
-      for j in range( 0, 3 ):
-        rho[i] += r[j] * self.rec_vec[j][i] / self.lat_c
-      # end for
-    # end for
-    return rho
+    return numpy.dot( 1.0 / self.lat_c, numpy.dot( r, self.rec_vec ) )
   # end def
 
   def position_cart( self, rho = numpy.zeros( 3 ) ):
-    r = numpy.zeros( 3 )
-    for i in range( 0, 3 ):
-      for j in range( 0, 3 ):
-        r[i] += rho[j] * self.lat_vec[j][i] * self.lat_c
-      # end for
-    # end for
-    return r
+    return numpy.dot( self.lat_c, numpy.dot( rho, self.lat_vec ) )
   # end def
 
   def position( self, atom = None, pt = PT.Direct ):
@@ -184,4 +169,60 @@ class Geometry:
     # end for
   # end def
 
+  def supercell( self, msc = numpy.zeros( [3, 3] ) ):
+    vol = numpy.dot( msc[0,:], numpy.cross( msc[1,:], msc[2,:] ) )
+    if not vol > 0.0:
+      raise Exception( 'Not a right-hand system' )
+    # end if
+    # clone
+    geom = self.clone()
+
+    # scale lat_c
+    if geom.lat_c != 1.0:
+      geom.lat_vec = numpy.dot( geom.lat_c, geom.lat_vec )
+    # end if
+    # scale base
+    geom.cart()
+
+    sup_lat_vec = numpy.dot( msc, self.lat_vec )
+    cmb = [[],[],[]]
+    for i in range(0,3):
+      mij = [0,0,0]
+      lmn = [[],[],[]]
+      for j in range(0,3):
+        ij = msc[i][j]
+        if ij < 0:
+          mij[j] = ij
+          lmn[j] = range(mij[j],0)
+        else:
+          mij[j] = ij + 1
+          lmn[j] = range(1,mij[j])
+        # end if
+        if lmn[j] == []:
+          lmn[j] = [0]
+      # end for
+      
+      print lmn
+      for l in lmn[0]:
+        for m in lmn[1]:
+          for n in lmn[2]:
+            print i,l,m,n
+            cmb[i] += [[l,m,n]]
+          # end for
+        # end for
+      # end for
+    # end for
+
+    for o in cmb[0]:
+      for p in cmb[1]:
+        for q in cmb[2]:
+          cmm = numpy.array([o,p,q])
+          cmm_lat_vec = numpy.dot( cmm, self.lat_vec )
+          print cmm_lat_vec
+          # base transport
+        # end for
+      # end for
+    # end for
+    print len(cmb[0])*len(cmb[1])*len(cmb[2])
+  # end def
 # end class Geometry

@@ -6,7 +6,6 @@ import sys
 import copy
 import string
 import numpy
-from numpy import linalg
 
 class Enum( object ):
   def __init__( self, elist ):
@@ -17,10 +16,9 @@ class Enum( object ):
 # end class
 
 
-PT  = Enum( 'Direct Cart' )
-PTD = { PT.Direct : 'Direct', PT.Cart : 'Cart' }
-IOT = Enum( 'Input Output' )
-
+PositionTypes = Enum( 'Direct Cart' )
+PositionTypesDict = { PositionTypes.Direct : 'Direct', PositionTypes.Cart : 'Cart' }
+IOTypes = Enum( 'Input Output' )
 
 def TF( logical ):
   if logical:
@@ -28,29 +26,28 @@ def TF( logical ):
   return 'F'
 # end def
 
-
 class Debug:
-  def __init__( self, sysopts = { "verbose" : False, "debug" : False } ):
-    self.verbose = sysopts["verbose"]
-    self.debug   = sysopts["debug"]
+  def __init__( self, verbose = False, debug = False ):
+    self.verbose = verbose
+    self.debug   = debug
   # end def
 # end class
 
 
 class Buffer:
   def __init__( self ):
-    self.lc    = -1
+    self.lc    = 0
     self.line  = ""
     self.lines = {} 
   # end def
 
   def clean( self ):
-    self.lc = -1
+    self.lc = 0
     self.lines = {}
   # end def
 
   def rewind( self ):
-    self.lc = -1
+    self.lc = 0
   # end def
 
   def read( self, lines = None ):
@@ -76,7 +73,18 @@ class Buffer:
 # end class
 
 
-class VecPos:
+class Atom:
+  def __init__( self, symbol = "", no = 0, cl_shift = 0.000 ):
+    self.symbol = symbol
+    # not the atomic number !
+    self.no     = no
+    self.rno    = no
+    self.cl_shift = cl_shift
+  # end def
+# end class
+
+
+class VectorPosition:
   def __init__( self, vec = numpy.zeros( 3 ), moveable = None ):
     self.position  = numpy.array( vec )
     self.force     = numpy.zeros( 3 )
@@ -99,48 +107,54 @@ class VecPos:
 # end class
 
 
-class AtomPos(VecPos):
-  def __init__( self,  symbol = "", no = 0, cl_shift = 0.000, 
-                vec = numpy.zeros( 3 ), moveable = None ):
-    VecPos.__init__( self, vec, moveable )
-    self.symbol = symbol
-    # not the atomic number !
-    self.no  = no
-    self.rno = no
-    self.cl_shift = cl_shift
+class AtomPosition:
+  def __init__( self, atom = None, pos = None ):
+    self.atom = atom
+    self.pos  = pos
+  # end def
+
+  def symbol( self, newsym = None ):
+    if newsym != None:
+      self.atom.symbol = newsym
+    # end if
+    return self.atom.symbol
+  # end def
+
+  def position( self, newpos = None ):
+    if newpos != None:
+      self.pos.position = newpos
+    # end if
+    return self.pos.position
+  # end def
+
+  def moveable( self ):
+    return self.pos.moveable
+  # end def
+
+  def velocity( self ):
+    return self.pos.velocity
+  # end def
+
+  def no( self ):
+    return self.atom.no
+  # end def
+
+  def rno( self ):
+    return self.atom.rno
+  # end def
+
+  def cl_shift( self ):
+    return self.atom.cl_shift
   # end def
 
   def info( self ):
-    print " %4d" % self.no, "%2s" % self.symbol, self.position, self.moveable
+    print " %4d" % self.no(), "%2s" % self.symbol(), self.position(), self.moveable()
   # end def
 
-  def move( self, S = numpy.zeros( 3 ) ):
+  def shift( self, S = numpy.zeros( 3 ) ):
     for i in range( 0, 3 ):
-      self.position[i] += S[i]
+      self.pos.position[i] += S[i]
     # end for
   # end def
 # end class
 
-
-class Vector:
-  def __init__(self, tail = numpy.zeros(3), head = numpy.array([1,1,1])):
-    self.tail = tail
-    self.head = head
-  # end def
-
-  def vert(self):
-    return [self.tail, self.head]
-  # end def
-  
-  def nv(self):
-    r = numpy.subtract( self.head, self.tail )
-    n = numpy.linalg.norm(r)
-    return numpy.dot( r, 1.0 / n )
-  
-  def rm(self, ax = numpy.array([1,0,0])):
-    # A = ( U X^T ) inv( X X^T )
-    XXT = numpy.linalg.inv( numpy.kron( ax, ax ).reshape(3,3))
-    UXT = numpy.kron(self.nv(),ax).reshape(3,3)
-    print XXT,UXT
-  # end def
-# end class

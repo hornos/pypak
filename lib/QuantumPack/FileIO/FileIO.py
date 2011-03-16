@@ -6,20 +6,21 @@ import os
 import sys
 import string
 import numpy
-from pypak.Types import *
+from QuantumPack.Types import *
 
 # try to load io handler based on type
 class FileIO( Debug ):
   def __init__( self, path = None, type = None, opts = "rw", sysopts = { "verbose" : False, "debug" : False } ):
-    Debug.__init__( self, sysopts )
+    Debug.__init__( self, sysopts["verbose"], sysopts["debug"] )
 
     if string.find( opts, "r" ) > -1:
       if not os.path.isfile( path ) :
         raise IOError, str( path )
       # end if
     # end if
+    
     # try to load handler
-    handler_module = 'pypak.FileIO.' + str( type )
+    handler_module = 'QuantumPack.FileIO.' + str( type )
     module = __import__( handler_module, globals(), locals(), -1 )
     self.handler = module.FileIO( path, opts, sysopts )
   # end def __init__
@@ -45,6 +46,10 @@ class FileIO( Debug ):
       self.handler.geom = geom
     # end if
     return self.handler.geom
+  # end def
+
+  def voldata( self ):
+    return self.handler.voldata
   # end def
 
   def command( self, cmd = None, argv = None ):

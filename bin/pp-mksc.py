@@ -10,9 +10,8 @@ import numpy
 sys.path.append( os.path.dirname( sys.argv[0] ) + "/../lib" )
 ### END HEADER
 
-from pypak.Script import Script
-from pypak.FileIO.FileIO import FileIO as FIO
-from pypak.Lattice import Lattice
+from pypak.Script  import Script
+from pypak.IO.IO   import IO
 
 class Program( Script ):
   def __init__( self ):
@@ -20,7 +19,7 @@ class Program( Script ):
 
     self.opt( "-i", "--input",
               action = "store", type = "string",
-              dest = "input_name", default = "POSCAR",
+              dest = "input_name", default = "input.UPOT",
               help = "Input" )
 
     self.ini()
@@ -31,27 +30,33 @@ class Program( Script ):
     (options, args) = self.par()
 
     try:
-      scm = self.cfgarri( 'scm' )
+      msc = self.cfgarri( 'msc' )
+      msc = msc.reshape([3,3])
     except:
-      print ' Error: no scm matrix'
+      print ' Error: no supercell matrix'
       return 0
     # end try
 
-
     sysopts = { "verbose" : self.verbose, "debug" : self.debug }
     input_file = options.input_name
-    input_pos = FIO( input_file, 'POSCAR', "r", sysopts )
+    input_pos = IO( input_file, 'POSCAR', "r", sysopts )
     input_pos.read()
 
-    sc_geom = Lattice.mksc( geom, scm )
+    super_geom = input_pos.geom().supercell( msc )
 
   # end def main
+###
 ### END PROGRAM CLASS
+###
 
+
+###
 ### BEGIN MAIN
+###
 if __name__ == '__main__':
   p = Program()
   p.main()
 # end if
+###
 ### END MAIN
-
+###
