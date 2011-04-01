@@ -13,13 +13,16 @@ class LX( Lexer ):
   def __init__( self, path = None, sysopts = { "verbose" : False, "debug" : False } ):
     Lexer.__init__( self, path, sysopts )
     self.tokens.extend( ['INCAR_TAG', 'TAG', 'LABEL' ] )
+    self.states = [('TF','inclusive')]
+    self.hc = 0
+    self.c = 0
   # end def
 
   def t_INCAR_TAG( self, t ):
     r'[A-Z0-9_]+\ *=\ *[A-Z0-9._-]+'
     if self.verbose:
       print "INCAR_TAG:" + t.value
-    pass
+    # pass
   # end def
 
   def t_TAG( self, t ):
@@ -32,7 +35,7 @@ class LX( Lexer ):
     # end if
     if self.verbose:
       print "TAG:" + t.value
-    pass
+    # pass
   # end def
 
   def t_LABEL( self, t ):
@@ -47,6 +50,31 @@ class LX( Lexer ):
    # end if
     if self.verbose:
       print "LABEL:" + t.value
-    pass
+    # pass
+  # end def
+
+  def t_TF_end( self, t ):
+    r'\ *-+$'
+    if self.hc == 0:
+      self.hc += 1
+    else:
+      t.lexer.begin('INITIAL')
+      self.hc = 0
+      self.c
+  # end def
+
+  def t_begin_TF( self, t ):
+    r'TOTAL-FORCE'
+    self.c = 0
+    t.lexer.begin('TF')
+  # end def
+
+  def t_TF_POSVEC( self, t ):
+    r'([0-9.-]+\ +)+[0-9.-]+'
+    posvec = S2F( t.value )
+    tf = L2N( posvec[3:] )
+    if tf > 0.1:
+      print "%04d" % str( self.c ) + " HIGH Force: " + str( tf )
+    self.c += 1
   # end def
 # end class
