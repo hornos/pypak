@@ -74,7 +74,7 @@ class LX( Lexer ):
     posvec = S2F( t.value )
     tf = L2N( posvec[3:] )
     if tf > 0.1:
-      print "%04d" % str( self.c ) + " HIGH Force: " + str( tf )
+      print "%04d" % self.c + " HIGH Force: " + str( tf )
     self.c += 1
   # end def
 # end class
