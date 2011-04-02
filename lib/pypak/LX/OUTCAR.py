@@ -12,10 +12,12 @@ from pypak.LX.Lexer import Lexer
 class LX( Lexer ):
   def __init__( self, path = None, sysopts = { "verbose" : False, "debug" : False } ):
     Lexer.__init__( self, path, sysopts )
-    self.tokens.extend( ['INCAR_TAG', 'TAG', 'LABEL' ] )
+    self.tokens.extend( ['INCAR_TAG', 'TAG', 'LABEL',
+                         'ITER' ] )
     self.states = [('TF','inclusive')]
     self.hc = 0
     self.c = 0
+    self.it = ""
   # end def
 
   def t_INCAR_TAG( self, t ):
@@ -53,6 +55,11 @@ class LX( Lexer ):
     # pass
   # end def
 
+  def t_ITER( self, t ):
+    r'Iteration\ *[0-9]+\(\ *[0-9]+\)'
+    self.it = t.value
+  # def
+
   def t_TF_end( self, t ):
     r'\ *-+$'
     if self.hc == 0:
@@ -66,6 +73,7 @@ class LX( Lexer ):
   def t_begin_TF( self, t ):
     r'TOTAL-FORCE'
     self.c = 0
+    print "\n" + self.it
     t.lexer.begin('TF')
   # end def
 
@@ -74,7 +82,7 @@ class LX( Lexer ):
     posvec = S2F( t.value )
     tf = L2N( posvec[3:] )
     if tf > 0.1:
-      print "%04d" % self.c + " HIGH Force: " + str( tf )
+      print "%4d." % self.c + " HIGH Force: " + str( tf )
     self.c += 1
   # end def
 # end class
