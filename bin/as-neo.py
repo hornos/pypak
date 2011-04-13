@@ -32,6 +32,10 @@ class Program( Script ):
               dest = "unknown", default = False,
               help = "Show unknown" )
 
+    self.opt( "-f", "--fast",
+              action = "store_true",
+              dest = "fast", default = False,
+              help = "Fast" )
 
     self.ini()
   # end def __init__
@@ -63,11 +67,12 @@ class Program( Script ):
 
     ipr = IP4Range( line )
     for ip in ipr:
-      time.sleep(1)
+      if not options.fast:
+        time.sleep(1)
       try:
         h = socket.gethostbyaddr( ip )
       except:
-        if( options.unknown ):
+        if options.unknown:
           print "%20s %16s %s" % ( line, str( ip ), "unknown" )
         continue
       # end try
