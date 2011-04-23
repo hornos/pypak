@@ -27,6 +27,11 @@ class Program( Script ):
               dest = "input_name", default = "input.txt",
               help = "Input" )
 
+    self.opt( "-k", "--chkpt",
+              action = "store", type = "string",
+              dest = "chkpt_name", default = "checkpoint",
+              help = "Checkpoint" )
+
     self.opt( "-u", "--unknown",
               action = "store_true",
               dest = "unknown", default = False,
@@ -40,7 +45,6 @@ class Program( Script ):
     self.ini()
   # end def __init__
 
-
   ### MAIN BEGIN ###
   def main( self ):
     (options, args) = self.par()
@@ -52,41 +56,61 @@ class Program( Script ):
       sys.exit(1)
     # open db
 
+    self.chkpt = options.chkpt_name
+    cline = True
+    cip   = True
+    try:
+      chk = open( self.chkpt, "r" )
+    except:
+      self.lastip = None
+      self.lastline = None
+    else:
+      (self.lastline, self.lastip) = chk.readline().split( ":" )
+      self.lastline = string.strip( self.lastline )
+      self.lastip   = string.strip( self.lastip )
+      cline = False
+      cip   = False
+    # end try
 
     for line in inp.readlines():
       line = string.strip( line )
-      try:
-        cidr.match( line )
-      except:
-        continue
-      # end try
       if re.match("^([0-9]{1,3}\.){3}[0-9]{1,3}/[0-9]{1,3}$", line ) == None :
         continue
-      print line
-    # end for
-
-    ipr = IP4Range( line )
-    for ip in ipr:
-      if not options.fast:
-        time.sleep(1)
-      try:
-        h = socket.gethostbyaddr( ip )
-      except:
-        if options.unknown:
-          print "%20s %16s %s" % ( line, str( ip ), "unknown" )
+      if not self.lastline == None and self.lastline == line :
+        cline = True
+      if not cline :
         continue
-      # end try
-      names = h[1]
-      names.append(h[0])
-      for nam in names:
-        if string.find( nam, "in-addr.arpa" ) != -1:
+      print " Subnet:%20s" % line
+
+      ipr = IP4Range( line )
+      for ip in ipr:
+        if not self.lastip == None and self.lastip == ip :
+          cip = True
+        if not cip :
           continue
-        # end if
-        print "%20s %16s %s" % ( line, str( ip ), nam )
+        if not options.fast:
+          time.sleep(1)
+        try:
+          h = socket.gethostbyaddr( ip )
+        except:
+          if options.unknown:
+            print "        %20s %20s %s" % ( line, str( ip ), "unknown or failed" )
+          self.lastip = ip
+          self.lastline = line
+          continue
+        # end try
+        names = h[1]
+        names.append(h[0])
+        for nam in names:
+          if string.find( nam, "in-addr.arpa" ) != -1:
+            continue
+          # end if
+          print "%22s %22s %s" % ( line, str( ip ), nam )
+        # end for
+        self.lastip = ip
+        self.lastline = line
       # end for
-
     # end for
-
   # end def
 # end class
 
@@ -94,5 +118,14 @@ class Program( Script ):
 ### BEGIN MAIN
 if __name__ == '__main__':
   p = Program()
-  p.main()
+  try:
+    p.main()
+  except KeyboardInterrupt:
+    try:
+      fp = open( p.chkpt, "w" )
+    except:
+      sys.exit( 1 )
+    # end try
+    fp.write( "%s:%s\n" % ( p.lastline, p.lastip ) )
+  # end try
 ### END MAIN
