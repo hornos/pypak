@@ -6,7 +6,7 @@ import sys
 import copy
 import string
 
-from pypak.Macros import *
+from pypak.Math import *
 from pypak.LX.Lexer import Lexer
 
 class LX( Lexer ):

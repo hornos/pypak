@@ -26,4 +26,20 @@ class LX( Debug ):
     self.handler.build()
   # end def
 
+  def read( self ):
+    self.build()
+    self.process()
+    return self.result()
+  # end def
+
+  def geom( self, geom = None ):
+    if geom == None:
+      return self.handler.geom
+    else:
+      self.handler.geom = geom
+  # end def
+
+  def result( self ):
+    return self.handler.result
+  # end def
 # end class

@@ -7,6 +7,7 @@ import string
 import math
 import copy
 import numpy
+from pypak.Math import *
 from pypak.Types import *
 
 # TODO: verbose
@@ -22,8 +23,15 @@ class Geometry:
     self.lat_c   = 1.0000 # Ang
   # end def
 
-  def clone( self ):
+  def clone( self, bravais = False ):
     geom = Geometry( self.name )
+    geom.name = 'Clone:' + geom.name
+    if bravais:
+      geom.lat_vec = copy.deepcopy( self.lat_vec )
+      geom.rec_vec = copy.deepcopy( self.rec_vec )
+      geom.lat_c   = copy.deepcopy( self.lat_c )
+      return geom
+    # end if
     geom.species = copy.deepcopy( self.species )
     geom.atoms   = copy.deepcopy( self.atoms )
     geom.ac      = copy.deepcopy( self.ac )
@@ -34,6 +42,10 @@ class Geometry:
     return geom
   # end if
 
+  def bravais( self ):
+    return self.clone( True )
+  # end def
+
   def natoms( self ):
     return len( self.atoms )
   # end def
@@ -42,7 +54,7 @@ class Geometry:
     return len( self.species )
   # end def
 
-  def info( self ):
+  def info( self, header = False ):
     lv = self.lat_vec
     print "%20s%s" % ( "Name:", ' '+self.name )
     for i in range( 0, 3 ):
@@ -52,6 +64,8 @@ class Geometry:
     print "%20s%5d"  % ( "Atoms:", self.natoms() )
     print "%20s%5d"  % ( "PT:", self.pt )
 
+    if header:
+      return
     print "\n%5s%5s%12s%12s%12s" % ( "no", "sym", "x", "y", "z" )
     for atom in self.atoms:
       sym = atom.symbol
@@ -59,6 +73,10 @@ class Geometry:
       vec = atom.position
       print "%5s%5s%12.6f%12.6f%12.6f" % ( no, sym, vec[0], vec[1], vec[2] )
     # end for
+  # end def
+
+  def header( self ):
+    self.info( True )
   # end def
 
   def gen_species( self ):
@@ -76,11 +94,17 @@ class Geometry:
   # end def
 
 
-  def add( self, atom = None, renum = False ):
+  def add( self, atom = None, reno = True ):
     _atom = copy.deepcopy( atom )
-    _atom.no = self.ac
+    if reno:
+      _atom.no = self.ac
     self.atoms.append( _atom )
     self.ac += 1
+  # end def
+
+  def rem( self, atom = None ):
+    self.atoms.remove( atom )
+    self.ac -= 1
   # end def
 
   def get( self, i = 0, vmd = True ):
@@ -142,7 +166,6 @@ class Geometry:
     return pos
   # end def
 
-
   def cart( self ):
     # convert to cart
     if self.pt == PT.Direct:
@@ -169,6 +192,7 @@ class Geometry:
     # end for
   # end def
 
+  # TODO
   def supercell( self, msc = numpy.zeros( [3, 3] ) ):
     vol = numpy.dot( msc[0,:], numpy.cross( msc[1,:], msc[2,:] ) )
     if not vol > 0.0:
@@ -201,7 +225,7 @@ class Geometry:
         if lmn[j] == []:
           lmn[j] = [0]
       # end for
-      
+
       print lmn
       for l in lmn[0]:
         for m in lmn[1]:
@@ -224,5 +248,80 @@ class Geometry:
       # end for
     # end for
     print len(cmb[0])*len(cmb[1])*len(cmb[2])
+  # end def
+
+  # Transformations
+
+  def TF_around( self, c = [] ):
+    # switch to cart coords
+    self.cart()
+
+    # radius
+    r     = string.atof( c[1] )
+    origo = numpy.array( [ 0.0, 0.0, 0.0 ] )
+
+    # around an atom
+    if c[0] == 'A':
+      no = string.atoi( c[3] )
+      # get coords
+      atom = self.get( no )
+      origo = atom.position
+    # end if
+
+    # around an origo
+    if c[0] == 'O':
+      origo[0] = string.atof( c[2] )
+      origo[1] = string.atof( c[3] )
+      origo[2] = string.atof( c[4] )
+    # end if
+
+    # clone the bravais cell
+    around = self.bravais()
+    around.cart()
+
+    # copy atoms
+    for atom in self.atoms:
+      dr = L2N( atom.position - origo )
+      if dr < r:
+        around.add( atom, True )
+      # end if
+    # end for
+    around.gen_species()
+    return around
+  # end def
+
+  def TF_ins( self, c = [] ):
+    pos  = numpy.array( [ 0.0, 0.0, 0.0 ] )
+    _pos = numpy.array( [ 0.0, 0.0, 0.0 ] )
+    s = c[1]
+    pos[0] = string.atof( c[2] )
+    pos[1] = string.atof( c[3] )
+    pos[2] = string.atof( c[4] )
+    _pos = pos
+    if c[0][0] != PTD[self.pt][0]:
+      if c[0][0] == 'C':
+        # C -> D
+        _pos = self.position_direct( pos )
+      else:
+        # D -> C
+        _pos = self.position_cart( pos )
+      # end if
+    # end if
+
+    # insert atom
+    self.add( AtomPos( symbol = s, vec = _pos ) )
+    self.gen_species()
+  # end def
+
+  def TF_del( self, c = [] ):
+    no = string.atoi( c[0] )
+    s  = c[1]
+    atom = self.get( no )
+    if atom.symbol != s:
+      atom.info()
+      raise Warning( "Symbol mismatch" )
+    # end if
+    self.rem( atom )
+    self.gen_species()
   # end def
 # end class Geometry
