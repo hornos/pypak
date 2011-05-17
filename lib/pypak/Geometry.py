@@ -268,17 +268,25 @@ class Geometry:
     geom.cart()
     self.cart()
 
+    # build diff geom
+    dgeom = self.bravais()
+    dgeom.name = 'Diff:' + dgeom.name
+    dgeom.cart()
+
     for atom in self.atoms:
-      pos = atom.position
+      pos   = atom.position
       natom = geom.nearest( pos )
-      npos = natom.position
-      dpos = pos - npos
+      npos  = natom.position
+      dpos  = npos - pos
       d = L2N( dpos )
       if d > ll and d < ul:
         print "R  " + str( atom.no ) + " " + atom.symbol + " " + str( atom.position )
         print "N  " + str( natom.no ) + " " + natom.symbol + " " + str( natom.position ) + " " + str( dpos )
-
+        natom.position = dpos
+        dgeom.add( natom, False )
     # end for
+    dgeom.gen_species()
+    return dgeom
   # end def
 
   # Transformations

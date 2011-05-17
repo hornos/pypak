@@ -28,6 +28,11 @@ class Program( Script ):
               dest = "ref_name", default = "ref.POSCAR",
               help = "Reference" )
 
+    self.opt( "-o", "--output",
+              action = "store", type = "string",
+              dest = "output_name", default = "delta.POSCAR",
+              help = "Output" )
+
     self.opt( "-l", "--lower",
               action = "store", type = "float",
               dest = "ll", default = 0.1,
@@ -46,6 +51,7 @@ class Program( Script ):
   def main( self ):
     (options, args) = self.par()
     input_name  = options.input_name
+    output_name = options.output_name
     ref_name    = options.ref_name
     ul = string.atof( options.ul )
     ll = string.atof( options.ll )
@@ -64,13 +70,13 @@ class Program( Script ):
     rgeom = ref_file.geom()
 
     print "Reference: " + ref_name + "  New: " + input_name
-    rgeom.diff( igeom, ll, ul )
+    dgeom = rgeom.diff( igeom, ll, ul )
 
     # output
-    # opts = { 'pt' : PT.Cart }
-    # output_file = IO( output_name, 'POSCAR', "w+", sysopts )
-    # output_file.geom( geom )
-    # output_file.write( opts )
+    opts = { 'pt' : PT.Cart }
+    output_file = IO( output_name, 'delta', "w+", sysopts )
+    output_file.geom( dgeom )
+    output_file.write( opts )
 
   # end def
 # end class
