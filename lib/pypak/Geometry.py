@@ -133,7 +133,7 @@ class Geometry:
     nearest_atom = None
     nearest_dpos = 100000.000
     for atom in self.atoms:
-      dpos_vec = abs( numpy.subtract( atom.position(), pos ) )
+      dpos_vec = abs( numpy.subtract( atom.position, pos ) )
       dpos_max = dpos_vec[ numpy.argmax( dpos_vec ) ]
       if dpos_max < nearest_dpos :
         nearest_atom = atom
@@ -196,7 +196,7 @@ class Geometry:
   def supercell( self, msc = numpy.zeros( [3, 3] ) ):
     vol = numpy.dot( msc[0,:], numpy.cross( msc[1,:], msc[2,:] ) )
     if not vol > 0.0:
-      raise Exception( 'Not a right-hand system' )
+      raise Warning( 'Not a right-hand system' )
     # end if
     # clone
     geom = self.clone()
@@ -248,6 +248,37 @@ class Geometry:
       # end for
     # end for
     print len(cmb[0])*len(cmb[1])*len(cmb[2])
+  # end def
+
+  # very simple diff
+  def diff( self, geom = None, ll = 0.001, ul = 1.5 ):
+    # check lattice
+    if abs( self.lat_c - geom.lat_c) > 0.001:
+      raise Warning( 'Lattice constant' )
+    for i in range(0,3):
+      if L2N( self.lat_vec[i] - geom.lat_vec[i] ) > 0.001:
+        raise Warning( 'Lattice vector' )
+    # end for
+
+    # check atoms
+    if abs( self.ac - geom.ac ):
+      raise Warning( 'Atoms' )
+
+    # check coordinates
+    geom.cart()
+    self.cart()
+
+    for atom in self.atoms:
+      pos = atom.position
+      natom = geom.nearest( pos )
+      npos = natom.position
+      dpos = pos - npos
+      d = L2N( dpos )
+      if d > ll and d < ul:
+        print "R  " + str( atom.no ) + " " + atom.symbol + " " + str( atom.position )
+        print "N  " + str( natom.no ) + " " + natom.symbol + " " + str( natom.position ) + " " + str( dpos )
+
+    # end for
   # end def
 
   # Transformations
@@ -311,6 +342,7 @@ class Geometry:
     # insert atom
     self.add( AtomPos( symbol = s, vec = _pos ) )
     self.gen_species()
+    return self
   # end def
 
   def TF_del( self, c = [] ):
@@ -323,5 +355,6 @@ class Geometry:
     # end if
     self.rem( atom )
     self.gen_species()
+    return self
   # end def
 # end class Geometry
