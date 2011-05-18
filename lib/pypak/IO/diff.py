@@ -90,9 +90,11 @@ class IO( File ):
         y = string.atof( y )
         z = string.atof( z )
         no = string.atoi( no )
+
+        # without renumbering
         self.geom.add( AtomPos( symbol = symb, no = no, 
                                 vec = [ x, y, z ], 
-                                moveable = [ xm, ym, zm ] ) )
+                                moveable = [ xm, ym, zm ] ), False )
         if self.debug:
           print " %05d Process:" % self.lc(), "%4d" % j, "%3d" % i, "%2s" % s, self.line()
         # end if

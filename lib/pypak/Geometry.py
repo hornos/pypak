@@ -251,7 +251,7 @@ class Geometry:
   # end def
 
   # very simple diff
-  def diff( self, geom = None, ll = 0.001, ul = 1.5 ):
+  def diff( self, geom = None, ll = 0.001, ul = 1.5, na = False ):
     # check lattice
     if abs( self.lat_c - geom.lat_c) > 0.001:
       raise Warning( 'Lattice constant' )
@@ -277,19 +277,38 @@ class Geometry:
       pos   = atom.position
       natom = geom.nearest( pos )
       npos  = natom.position
-      dpos  = npos - pos
+      # delta should be substracted
+      dpos  = pos - npos
       d = L2N( dpos )
       if d > ll and d < ul:
         print "R  " + str( atom.no ) + " " + atom.symbol + " " + str( atom.position )
         print "N  " + str( natom.no ) + " " + natom.symbol + " " + str( natom.position ) + " " + str( dpos )
-        natom.position = dpos
-        dgeom.add( natom, False )
+        if na:
+          natom.position = dpos
+          dgeom.add( natom, False )
+        else:
+          atom.position = dpos
+          dgeom.add( atom, False )
     # end for
     dgeom.gen_species()
     return dgeom
   # end def
 
-  # Transformations
+  def patch( self, geom = None ):
+    self.cart()
+    geom.cart()
+    for atom in geom.atoms:
+      no  = atom.no
+      if atom.symbol != self.get(no).symbol:
+        raise Warning( "Symbol mismatch" )
+      pos = self.get( no ).position
+      pos -= atom.position
+      self.get( no ).position = pos
+    # end for
+    return self
+  # end def
+
+  ### Transformations
 
   def TF_around( self, c = [] ):
     # switch to cart coords
