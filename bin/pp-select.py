@@ -49,10 +49,15 @@ class Program( Script ):
     atom.info()
 
     if geom.pt == PT.Cart:
-      print "Direct : ", geom.position( atom, PT.Direct )
+      dp = geom.position( atom, PT.Direct )
+      cp = atom.position
     else:
-      print "Cart : ", geom.position( atom, PT.Cart )
+      dp = atom.position
+      cp = geom.position( atom, PT.Cart )
     # end if
+
+    print " Frac : %21.16f%21.16f%21.16f" % (dp[0],dp[1],dp[2])
+    print " Cart : %21.16f%21.16f%21.16f" % (cp[0],cp[1],cp[2])
 
   # end def
 # end class
