@@ -61,6 +61,12 @@ class Transform:
       self.geom.transform_vcrop( self.content )
     if self.keyword == 'scc':
       self.geom.transform_scc( self.content )
+    if self.keyword == 'latrot':
+      self.geom.transform_latrot( self.content )
+    if self.keyword == 'mirror':
+      self.geom.transform_mirror( self.content )
+    if self.keyword == 'rot':
+      self.geom.transform_rot( self.content )
     return t
   # end def
 

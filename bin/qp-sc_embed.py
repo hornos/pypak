@@ -34,6 +34,12 @@ class Program( Script ):
                          help = "Embed", 
                          metavar="EMBED" )
 
+    self.opt_parser.add_option( "-d", "--direct",
+                         action = "store_true",
+                         dest = "direct", default = False,
+                         help = "Direct" )
+
+
     self.init()
   # end def __init__
 
@@ -41,6 +47,7 @@ class Program( Script ):
   ### MAIN BEGIN ###
   def main( self ):
     (options, args) = self.opt_parser.parse_args()
+    direct = options.direct
 
     sysopts = { "verbose" : self.verbose, "debug" : self.debug }
     input_desc = options.input_desc
@@ -66,8 +73,13 @@ class Program( Script ):
     
     geom.gen_species()
     geom.order()
-    
-    write_geom( 'embed', sysopts, geom )
+
+    position_type = PositionTypes.Cart
+    if direct:
+      position_type = PositionTypes.Direct
+    # end if
+
+    write_geom( 'embed', sysopts, geom, position_type )
     
   # end def main
 ### END PROGRAM CLASS

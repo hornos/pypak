@@ -406,6 +406,120 @@ class Geometry:
     return natom
   # end def
 
+
+  def transform_mirror(self, shift = [], vmdindex = True ):
+    i = shift[0]
+    i = string.atoi(i)
+    # xy: 2 xz: 1 yz: 0
+    for atom in self.atoms:
+      atom.pos.position[i] = -1.0 * atom.pos.position[i]
+    # end for
+    print " Mirror: ", i
+  # end def
+
+  def transform_rot(self, shift = [], vmdindex = True ):
+    (a,b,c) = shift
+    a = string.atof(a)*2.0*math.pi/180.0
+    b = string.atof(b)*2.0*math.pi/180.0
+    c = string.atof(c)*2.0*math.pi/180.0
+    Rx = numpy.zeros((3,3))
+    Ry = numpy.zeros((3,3))
+    Rz = numpy.zeros((3,3))
+    L  = numpy.zeros((3,3))
+    R  = numpy.zeros((3,3))
+
+    # x-axis
+    Rx[0][0] = 1.0
+    Rx[1][1] = math.cos(a)
+    Rx[1][2] = -math.sin(a)
+    Rx[2][1] = math.sin(a)
+    Rx[2][2] = math.cos(a)
+
+    # y-axis
+    Ry[1][1] = 1.0
+    Ry[0][0] = math.cos(b)
+    Ry[0][2] = math.sin(b)
+    Ry[2][0] = -math.sin(b)
+    Ry[2][2] = math.cos(b)
+
+    # z-axis
+    Rz[2][2] = 1.0
+    Rz[0][0] = math.cos(c)
+    Rz[0][1] = -math.sin(c)
+    Rz[1][0] = math.sin(c)
+    Rz[1][1] = math.cos(c)
+
+    for i in range(0,3):
+      for j in range(0,3):
+        L[i][j] = self.lattice_vectors[i][j]
+
+    print "Rz"
+    print Rz
+    Rz = numpy.transpose(Rz)
+    print "Original:"
+    print self.lattice_vectors
+
+    R = numpy.dot(L,Rz)
+    for i in range(0,3):
+      for j in range(0,3):
+        self.lattice_vectors[i][j] = R[i][j]
+
+    print "New:"
+    print self.lattice_vectors
+  # end def
+
+  def transform_latrot(self, shift = [], vmdindex = True ):
+    (deg, mir) = shift
+    deg = string.atoi(deg)
+    mir = string.atoi(mir)
+    # rotated lattice
+    L = numpy.zeros( (3,3) )
+
+    deg = abs( deg % 4 )
+
+    if deg == 1:
+      for k in range(0,3):
+        L[k][0] = self.lattice_vectors[k][1]
+        L[k][1] = -1.000 * self.lattice_vectors[k][0]
+      # end
+      L[2][2] = self.lattice_vectors[2][2]
+    elif deg == 2:
+      for k in range(0,3):
+        L[k][0] = -1.000 * self.lattice_vectors[k][0]
+        L[k][1] = -1.000 * self.lattice_vectors[k][1]
+      # end
+      L[2][2] = self.lattice_vectors[2][2]
+    elif deg == 3:
+      for k in range(0,3):
+        L[k][0] = -1.000 * self.lattice_vectors[k][1]
+        L[k][1] = self.lattice_vectors[k][0]
+      # end
+      L[2][2] = self.lattice_vectors[2][2]
+    else:
+    # end
+      for k in range(0,3):
+        for l in range(0,3):
+          L[k][l] = self.lattice_vectors[k][l]
+        # end
+      # end
+    # end
+
+    mir = abs( mir % 3 )
+    for k in range(0,3):
+      L[k][mir] = -1.000 * L[k][mir]
+    # end
+
+    print "Original"
+    print self.lattice_vectors
+    print "New"
+    for k in range(0,3):
+      for l in range(0,3):
+        self.lattice_vectors[k][l] = L[k][l]
+      # end
+    # end
+    print self.lattice_vectors
+  # end def
+
   def transform_cshift(self, shift = [], vmdindex = True ):
     # (cx,cy,cz,sym,no) = shift
     (cx,cy,cz,deg,mir,sym,no) = shift
@@ -514,7 +628,7 @@ class Geometry:
     print ' Transform: shift', c, sym, no
   # end def
 
-  
+
   def transform_rshift( self, shift = [] ):
     (cx,cy,cz,ax,op,lim) = shift
     cx = string.atoi(cx)
@@ -602,7 +716,7 @@ class Geometry:
     print ' Transform: lshift'
   # end def
 
-  
+
   def transform_insert( self, c = [] ):
     for i in range(0,3):
       c[i] = string.atof( c[i] )
@@ -627,10 +741,10 @@ class Geometry:
     if self.position_type == PositionTypes.Direct:
       convert = True
     # end if
-    
+
     tot = 0
     rem = 0
-    
+
     removed  = []
     remno    = []
     keepno   = []
@@ -698,6 +812,8 @@ class Geometry:
     print "Normal"
     print avpstr
 
+    print self.lattice_vectors
+
     self.gen_species()
     self.order()
   # end def
@@ -719,7 +835,11 @@ class Geometry:
     if atom.symbol() != sym:
       print ' Warning: symbol mismatch' 
 
-    origo = atom.position()
+    if self.position_type == PositionTypes.Direct:
+      origo = self.position_cart( atom.position() )
+    else:
+      origo = atom.position()
+
     self.transform_vcrop( [ origo[0], origo[1], origo[2], r, no ], invert )
     print ' Transform: crop',no,sym,origo
   # end def
