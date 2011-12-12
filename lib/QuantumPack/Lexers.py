@@ -53,6 +53,8 @@ class Transform:
       self.geom.transform_stretch( self.content )
     if self.keyword == 'insert':
       self.geom.transform_insert( self.content )
+    if self.keyword == 'delete':
+      self.geom.transform_delete( self.content )
     if self.keyword == 'crop':
       self.geom.transform_crop( self.content )
     if self.keyword == 'icrop':

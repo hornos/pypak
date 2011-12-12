@@ -67,6 +67,7 @@ class Geometry:
         self.species[sym] = 1
       # end try
     # end for
+    print self.species
   # end def
 
 
@@ -727,6 +728,22 @@ class Geometry:
     print ' Transform: insert'
   # end def
 
+  def transform_delete( self, c = [], vmdindex = True  ):
+    # 0: no, 1: sym
+    no  = string.atoi( c[0] )
+    if not vmdindex:
+      no -= 1
+    # end if
+    sym = c[1]
+    atom = self.atoms[no]
+    if atom.symbol() != sym:
+      print ' Warning: symbol mismatch' 
+    atom.info()
+    self.atoms.remove( atom )
+    self.gen_species()
+    self.order()
+    print ' Transform: delete'
+  # end def
 
   def transform_vcrop( self, c = [], invert = False ):
     for i in range(0,4):
