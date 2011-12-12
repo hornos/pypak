@@ -76,7 +76,6 @@ class Program( Script ):
   # end def
 # end class
 
-
 ### BEGIN MAIN
 if __name__ == '__main__':
   p = Program()
