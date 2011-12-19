@@ -43,7 +43,7 @@ class Program( Script ):
     try:
       shift = self.getoptarrf( 'shift' )
     except:
-      shift = array( [0.000 0.000 0.000])
+      shift = array( [0.000, 0.000, 0.000])
     # end try
 
     sysopts = { "verbose" : self.verbose, "debug" : self.debug }
