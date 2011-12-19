@@ -3,6 +3,7 @@
 import os
 import sys
 import string
+import numpy
 
 ### BEGIN HEADER
 script_name = os.path.basename( sys.argv[0] )
@@ -43,7 +44,7 @@ class Program( Script ):
     try:
       shift = self.getoptarrf( 'shift' )
     except:
-      shift = array( [0.000, 0.000, 0.000])
+      shift = numpy.zeros( 3 )
     # end try
 
     sysopts = { "verbose" : self.verbose, "debug" : self.debug }
