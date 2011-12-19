@@ -84,10 +84,10 @@ class Program( Script ):
       for atom in geom.atoms:
         if atom.symbol() == s:
           pos = geom.position( atom, PositionTypes.Cart )
-          output_in.write( "\n%20.16f %20.16f %20.16f" % (pos[0], pos[1], pos[2]) )
+          output_in.write( "%20.16f %20.16f %20.16f\n" % (pos[0], pos[1], pos[2]) )
         # end if
       # end for
-      output_in.write( "\n\n%20.16f %20.16f %20.16f\n" % (shift[0], shift[1], shift[2]) )
+      output_in.write( "\n%20.16f %20.16f %20.16f\n" % (shift[0], shift[1], shift[2]) )
       output_in.close()
 
     # end for s
