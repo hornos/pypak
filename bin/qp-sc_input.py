@@ -40,6 +40,12 @@ class Program( Script ):
       return 0
     # end try
 
+    try:
+      shift = self.getoptarrf( 'shift' )
+    except:
+      shift = array( [0.000 0.000 0.000])
+    # end try
+
     sysopts = { "verbose" : self.verbose, "debug" : self.debug }
     input_file = options.input_file
     try:
@@ -51,9 +57,9 @@ class Program( Script ):
     input_poscar.read()
 
     geom = input_poscar.geom()
-    
+
     for s in geom.species:
-      output_file = str( s ) + "-" + input_file + ".SCCIN"
+      output_file = str( s ) + "-" + input_file + ".wsgen"
       # print output_file
       try:
         output_in = open( output_file, "w+" )
@@ -67,20 +73,20 @@ class Program( Script ):
       output_in.write( "%9.6f %9.6f %9.6f\n" % (0.000000, scale[1], 0.000000) )
       output_in.write( "%9.6f %9.6f %9.6f\n" % (0.000000, 0.000000, scale[2]) )
       output_in.write( "userdef\n" )
-      
+
       for lv in geom.lattice_vectors:
         output_in.write( "%20.16f %20.16f %20.16f\n" % (lv[0], lv[1], lv[2]) )
       # end for
-      
+
       output_in.write( "%d\n" % geom.species[s] )
       # find specie s
       for atom in geom.atoms:
         if atom.symbol() == s:
           pos = geom.position( atom, PositionTypes.Cart )
-          output_in.write( "%20.16f %20.16f %20.16f\n" % (pos[0], pos[1], pos[2]) )
+          output_in.write( "\n%20.16f %20.16f %20.16f" % (pos[0], pos[1], pos[2]) )
         # end if
       # end for
-      output_in.write( "\n0.000 0.000 0.000\n" )
+      output_in.write( "\n%20.16f %20.16f %20.16f\n" % shift )
       output_in.close()
 
     # end for s
