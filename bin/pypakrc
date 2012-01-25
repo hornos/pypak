@@ -1,0 +1,10 @@
+### global
+pypak_root=$(cd $(dirname "${BASH_SOURCE}");cd ..;pwd -P)
+
+PATH=${PATH}:${pypak_root}/bin
+
+if test -z "${PYTHONPATH}" ; then
+  export PYTHONPATH="${pypak_root}/lib"
+else
+  PYTHONPATH=${PYTHONPATH}:${pypak_root}/lib
+fi
